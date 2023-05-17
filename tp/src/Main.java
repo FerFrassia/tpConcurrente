@@ -4,7 +4,11 @@ public class Main {
         c1.agregar(1);
         c1.agregar(2);
         c1.agregar(3);
+        c1.agregar(4);
+        c1.quitar(1);
+        c1.quitar(4);
         c1.print();
+
 
         ConjuntoOptimista<Integer> c2 = new ConjuntoOptimista<Integer>();
         c2.agregar(4);

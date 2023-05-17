@@ -7,7 +7,7 @@ public class ConjuntoOptimista<T> implements Conjunto<T> {
     }
 
     @Override
-    public void agregar(T elemento) {
+    public boolean agregar(T elemento) {
         //TO DO: borrar esto y hacer la implementacion posta
         Node newNode = new Node(elemento);
         if (list.head == null) {
@@ -19,16 +19,18 @@ public class ConjuntoOptimista<T> implements Conjunto<T> {
             }
             currentNode.next = newNode;
         }
+
+        return true;
     }
 
     @Override
-    public Boolean pertenece(T elemento) {
+    public boolean pertenece(T elemento) {
         return false;
     }
 
     @Override
-    public void quitar(T elemento) {
-
+    public boolean quitar(T elemento) {
+        return false;
     }
 
     @Override
