@@ -13,13 +13,13 @@ public class ConjuntoConLocksFinos<T> implements Conjunto<T> {
         Node<T> newNode = new Node<T>(elemento);
         int key = elemento.hashCode();
 
-        Node<T> currentNode = list.head.next; //El primer elemento de la lista
         Node<T> previousNode = list.head; //El centinela
+        Node<T> currentNode = list.head.next; //El primer elemento de la lista
 
         try {
 
-            if(currentNode != null) currentNode.lock();
             previousNode.lock();
+            if(currentNode != null) currentNode.lock();
             
             while(currentNode != null && currentNode.key < key) { //Busco el lugar donde insertar el nuevo nodo
                 previousNode.unlock();
@@ -37,24 +37,24 @@ public class ConjuntoConLocksFinos<T> implements Conjunto<T> {
             return true;
 
         } finally {
-            if(currentNode != null) currentNode.unlock();
             previousNode.unlock();
+            if(currentNode != null) currentNode.unlock();
         }
     }
 
 
     @Override
     public boolean pertenece(T elemento) {
-        Node<T> currentNode = list.head.next; 
         Node<T> previousNode = list.head;
+        Node<T> currentNode = list.head.next; 
         int key = elemento.hashCode();
 
         try {
 
             if(currentNode == null) return false;
 
-            currentNode.lock();
             previousNode.lock();
+            currentNode.lock();
             
             while(currentNode != null && currentNode.key < key) {
                 previousNode.unlock();
@@ -68,8 +68,8 @@ public class ConjuntoConLocksFinos<T> implements Conjunto<T> {
             return currentNode != null && key == currentNode.key;
 
         } finally {
-            if(currentNode != null) currentNode.unlock();
             previousNode.unlock();
+            if(currentNode != null) currentNode.unlock();
         }
     }
 
@@ -77,13 +77,13 @@ public class ConjuntoConLocksFinos<T> implements Conjunto<T> {
     public boolean quitar(T elemento) {
         int key = elemento.hashCode();
 
-        Node<T> currentNode = list.head.next; 
         Node<T> previousNode = list.head; 
+        Node<T> currentNode = list.head.next; 
 
         try {
 
-            if(currentNode != null) currentNode.lock();
             previousNode.lock();
+            if(currentNode != null) currentNode.lock();
             
             while(currentNode != null && currentNode.key <= key) { 
                if(currentNode.item == elemento){
@@ -100,8 +100,8 @@ public class ConjuntoConLocksFinos<T> implements Conjunto<T> {
             
             return false;
         } finally {
-            if(currentNode != null) currentNode.unlock();
             previousNode.unlock();
+            if(currentNode != null) currentNode.unlock();
         }
     }
 

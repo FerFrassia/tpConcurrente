@@ -6,31 +6,99 @@ public class ConjuntoOptimista<T> implements Conjunto<T> {
         list = new List();
     }
 
+    private boolean validate (Node<T> currentNode, Node<T> previousNode){
+        Node<T> auxiliarNode = list.head;
+        while(auxiliarNode != null && auxiliarNode.key <= previousNode.key){
+            if(auxiliarNode == previousNode) return previousNode.next == currentNode;
+            auxiliarNode = auxiliarNode.next;
+        }
+        return false;
+    }
+
     @Override
     public boolean agregar(T elemento) {
-        //TO DO: borrar esto y hacer la implementacion posta
-        Node newNode = new Node(elemento);
-        if (list.head == null) {
-            list.head = newNode;
-        } else {
-            Node currentNode = list.head;
-            while (currentNode.next != null) {
+        Node<T> newNode = new Node<T>(elemento);
+        int key = elemento.hashCode();
+
+        while (true){
+            Node<T> previousNode = list.head; 
+            Node<T> currentNode = list.head.next; 
+
+            while(currentNode != null && currentNode.key < key) { 
+                previousNode = currentNode;
                 currentNode = currentNode.next;
             }
-            currentNode.next = newNode;
-        }
+            previousNode.lock();
+            if(currentNode != null) currentNode.lock();
 
-        return true;
+            try {
+                if(validate(currentNode, previousNode)){
+                    if(currentNode != null && currentNode.key == key) return false;
+                    newNode.next = currentNode;
+                    previousNode.next = newNode;
+                    return true;
+                }    
+            } finally {
+                if(currentNode != null) currentNode.unlock();
+                previousNode.unlock();
+            }
+        }
     }
 
     @Override
     public boolean pertenece(T elemento) {
-        return false;
+        int key = elemento.hashCode();
+
+        while (true){
+            Node<T> previousNode = list.head; 
+            Node<T> currentNode = list.head.next; 
+
+            while(currentNode != null && currentNode.key < key) { 
+                previousNode = currentNode;
+                currentNode = currentNode.next;
+            }
+            previousNode.lock();
+            if(currentNode != null) currentNode.lock();
+
+            try {
+                if(validate(currentNode, previousNode)){
+                    return currentNode != null && currentNode.key == key;
+                }    
+            } finally {
+                if(currentNode != null) currentNode.unlock();
+                previousNode.unlock();
+            }
+        }
     }
 
     @Override
     public boolean quitar(T elemento) {
-        return false;
+        int key = elemento.hashCode();
+
+        while (true){
+            Node<T> previousNode = list.head; 
+            Node<T> currentNode = list.head.next; 
+
+            while(currentNode != null && currentNode.key < key) { 
+                previousNode = currentNode;
+                currentNode = currentNode.next;
+            }
+            previousNode.lock();
+            if(currentNode != null) currentNode.lock();
+
+            try {
+                if(validate(currentNode, previousNode)){
+                    if(currentNode != null && currentNode.key == key){
+                        previousNode.next = currentNode.next;
+                        return true;
+                    }
+                    return false;
+                }    
+            } finally {
+                if(currentNode != null) currentNode.unlock();
+                previousNode.unlock();
+            }
+        }
     }
 
     @Override

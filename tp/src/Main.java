@@ -14,6 +14,7 @@ public class Main {
         c2.agregar(4);
         c2.agregar(5);
         c2.agregar(6);
+        c2.quitar(5);
         c2.print();
 
         ConjuntoSinLocks<Integer> c3 = new ConjuntoSinLocks<Integer>();
