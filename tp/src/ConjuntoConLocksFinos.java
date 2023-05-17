@@ -75,7 +75,6 @@ public class ConjuntoConLocksFinos<T> implements Conjunto<T> {
 
     @Override
     public boolean quitar(T elemento) {
-        Node<T> newNode = new Node<T>(elemento);
         int key = elemento.hashCode();
 
         Node<T> currentNode = list.head.next; 
