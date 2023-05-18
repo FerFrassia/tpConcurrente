@@ -1,10 +1,4 @@
-public class ConjuntoSinLocks<T> implements Conjunto<T> {
-
-    List list;
-
-    public ConjuntoSinLocks() {
-        list = new List();
-    }
+public class ConjuntoSinLocks<T> extends Conjunto<T> {
 
     @Override
     public boolean agregar(T elemento) {
@@ -32,19 +26,6 @@ public class ConjuntoSinLocks<T> implements Conjunto<T> {
         return false;
     }
 
-    public void print() {
-        System.out.print("Sin Locks: ");
-        System.out.print("[");
-        Node currentNode = list.head;
-        while (currentNode != null) {
-            System.out.print(currentNode.item);
-            if (currentNode.next != null) {
-                System.out.print(" -> ");
-            }
-            currentNode = currentNode.next;
-        }
-        System.out.println("]");
-    }
 
 }
 

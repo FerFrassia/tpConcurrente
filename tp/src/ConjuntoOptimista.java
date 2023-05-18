@@ -1,10 +1,4 @@
-public class ConjuntoOptimista<T> implements Conjunto<T> {
-
-    List list;
-
-    public ConjuntoOptimista() {
-        list = new List();
-    }
+public class ConjuntoOptimista<T> extends Conjunto<T> {
 
     private boolean validate (Node<T> currentNode, Node<T> previousNode){
         Node<T> auxiliarNode = list.head;
@@ -75,45 +69,30 @@ public class ConjuntoOptimista<T> implements Conjunto<T> {
     public boolean quitar(T elemento) {
         int key = elemento.hashCode();
 
-        while (true){
-            Node<T> previousNode = list.head; 
-            Node<T> currentNode = list.head.next; 
+        while (true) {
+            Node<T> previousNode = list.head;
+            Node<T> currentNode = list.head.next;
 
-            while(currentNode != null && currentNode.key < key) { 
+            while (currentNode != null && currentNode.key < key) {
                 previousNode = currentNode;
                 currentNode = currentNode.next;
             }
             previousNode.lock();
-            if(currentNode != null) currentNode.lock();
+            if (currentNode != null) currentNode.lock();
 
             try {
-                if(validate(currentNode, previousNode)){
-                    if(currentNode != null && currentNode.key == key){
+                if (validate(currentNode, previousNode)) {
+                    if (currentNode != null && currentNode.key == key) {
                         previousNode.next = currentNode.next;
                         return true;
                     }
                     return false;
-                }    
+                }
             } finally {
-                if(currentNode != null) currentNode.unlock();
+                if (currentNode != null) currentNode.unlock();
                 previousNode.unlock();
             }
         }
-    }
-
-    @Override
-    public void print() {
-        System.out.print("Optimista: ");
-        System.out.print("[");
-        Node currentNode = list.head;
-        while (currentNode != null) {
-            System.out.print(currentNode.item);
-            if (currentNode.next != null) {
-                System.out.print(" -> ");
-            }
-            currentNode = currentNode.next;
-        }
-        System.out.println("]");
     }
 
 }

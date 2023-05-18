@@ -1,11 +1,4 @@
-public class ConjuntoConLocksFinos<T> implements Conjunto<T> {
-
-    List list;
-
-    public ConjuntoConLocksFinos() {
-        list = new List();
-        
-    }
+public class ConjuntoConLocksFinos<T> extends Conjunto<T> {
 
     @Override
     public boolean agregar(T elemento) {
@@ -105,18 +98,4 @@ public class ConjuntoConLocksFinos<T> implements Conjunto<T> {
         }
     }
 
-    @Override
-    public void print() {
-        System.out.print("Locks Finos: ");
-        System.out.print("[");
-        Node currentNode = list.head;
-        while (currentNode != null) {
-            System.out.print(currentNode.item);
-            if (currentNode.next != null) {
-                System.out.print(" -> ");
-            }
-            currentNode = currentNode.next;
-        }
-        System.out.println("]");
-    }
 }

@@ -1,5 +1,6 @@
 public class Main {
     public static void main(String[] args) {
+        /*
         ConjuntoConLocksFinos<Integer> c1 = new ConjuntoConLocksFinos<Integer>();
         c1.agregar(1);
         c1.agregar(2);
@@ -8,7 +9,6 @@ public class Main {
         c1.quitar(1);
         c1.quitar(4);
         c1.print();
-
 
         ConjuntoOptimista<Integer> c2 = new ConjuntoOptimista<Integer>();
         c2.agregar(4);
@@ -22,6 +22,10 @@ public class Main {
         c3.agregar(8);
         c3.agregar(9);
         c3.print();
+        */
+
+
+       new Tester().correrTests();
 
     }
 }
