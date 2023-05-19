@@ -7,12 +7,14 @@ public class ConjuntoConLocksFinos<T> extends Conjunto<T> {
         int key = elemento.hashCode();
 
         Node<T> previousNode = list.head; //El centinela
-        Node<T> currentNode = list.head.next; //El primer elemento de la lista
+        Node<T> currentNode = null;
 
         try {
-
             previousNode.lock();
+
+            currentNode = list.head.next; //El primer elemento de la lista
             if(currentNode != null) currentNode.lock();
+
             
             while(currentNode != null && currentNode.key < key) { //Busco el lugar donde insertar el nuevo nodo
                 previousNode.unlock();
