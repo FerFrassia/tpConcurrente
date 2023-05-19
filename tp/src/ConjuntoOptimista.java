@@ -1,6 +1,6 @@
 public class ConjuntoOptimista<T> extends Conjunto<T> {
 
-    private boolean validate (Node<T> currentNode, Node<T> previousNode){
+    private boolean validar (Node<T> currentNode, Node<T> previousNode){
         Node<T> auxiliarNode = list.head;
         while(auxiliarNode != null && auxiliarNode.key <= previousNode.key){
             if(auxiliarNode == previousNode) return previousNode.next == currentNode;
@@ -26,7 +26,7 @@ public class ConjuntoOptimista<T> extends Conjunto<T> {
             if(currentNode != null) currentNode.lock();
 
             try {
-                if(validate(currentNode, previousNode)){
+                if(validar(currentNode, previousNode)){
                     if(currentNode != null && currentNode.key == key) return false;
                     newNode.next = currentNode;
                     previousNode.next = newNode;
@@ -55,7 +55,7 @@ public class ConjuntoOptimista<T> extends Conjunto<T> {
             if(currentNode != null) currentNode.lock();
 
             try {
-                if(validate(currentNode, previousNode)){
+                if(validar(currentNode, previousNode)){
                     return currentNode != null && currentNode.key == key;
                 }    
             } finally {
@@ -81,7 +81,7 @@ public class ConjuntoOptimista<T> extends Conjunto<T> {
             if (currentNode != null) currentNode.lock();
 
             try {
-                if (validate(currentNode, previousNode)) {
+                if (validar(currentNode, previousNode)) {
                     if (currentNode != null && currentNode.key == key) {
                         previousNode.next = currentNode.next;
                         return true;

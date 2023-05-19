@@ -41,14 +41,15 @@ public class ConjuntoConLocksFinos<T> extends Conjunto<T> {
     @Override
     public boolean pertenece(T elemento) {
         Node<T> previousNode = list.head;
-        Node<T> currentNode = list.head.next; 
+        Node<T> currentNode = null; 
         int key = elemento.hashCode();
 
         try {
 
-            if(currentNode == null) return false;
-
             previousNode.lock();
+            currentNode = list.head.next;
+
+            if(currentNode == null) return false;
             currentNode.lock();
             
             while(currentNode != null && currentNode.key < key) {
@@ -73,15 +74,18 @@ public class ConjuntoConLocksFinos<T> extends Conjunto<T> {
         int key = elemento.hashCode();
 
         Node<T> previousNode = list.head; 
-        Node<T> currentNode = list.head.next; 
+        Node<T> currentNode = null; 
 
         try {
 
             previousNode.lock();
+
+            currentNode = list.head.next;
             if(currentNode != null) currentNode.lock();
+
             
             while(currentNode != null && currentNode.key <= key) { 
-               if(currentNode.item == elemento){
+                if(currentNode.key == key){
                     previousNode.next = currentNode.next;
                     return true;
                }

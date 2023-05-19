@@ -14,11 +14,16 @@ public class Tester {
 
         System.out.print("[locks finos] ");
         dosHilosAgregando1000Numeros(c);
-        c.vaciar();
+        
+        System.out.print("[locks finos] ");
+        dosHilosQuitando1000Numeros(c);
 
         System.out.print("[locks finos] ");
         cuatroHilosAgregando1000Numeros(c);
-        c.vaciar();
+        
+        System.out.print("[locks finos] ");
+        cuatroHilosQuitando1000Numeros(c);
+               
     }
 
     public void correrTestsParaOptimista() {
@@ -26,20 +31,15 @@ public class Tester {
 
         System.out.print("[optimista] ");
         dosHilosAgregando1000Numeros(c);
-        c.vaciar();
+        
+        System.out.print("[optimista] ");
+        dosHilosQuitando1000Numeros(c);
 
         System.out.print("[optimista] ");
         cuatroHilosAgregando1000Numeros(c);
-        c.vaciar();
-
-
-    }
-
-    public void correrTestsParaSinLocks() {
-        System.out.print("[sin locks] ");
-        ConjuntoSinLocks<Integer> c = new ConjuntoSinLocks<Integer>();
-        dosHilosAgregando1000Numeros(c);
-        c.vaciar();
+        
+        System.out.print("[optimista] ");
+        cuatroHilosQuitando1000Numeros(c);
     }
 
     //Agregamos 1000 números y creamos un hilo que agrega los pares y otro que agrega los impares
@@ -82,6 +82,42 @@ public class Tester {
         }
         chequearTerminacion(latch, c, intArray);
     }
+
+    //En un conjunto con 1000 números creamos un hilo que quita los pares y otro que quita los impares
+    public void dosHilosQuitando1000Numeros(Conjunto<Integer> c) {
+        System.out.print("dosHilosQuitando1000Numeros: ");
+        int latchGroupCount = 2;
+        CountDownLatch latch = new CountDownLatch(latchGroupCount);
+        Thread t1 = new Thread(new HiloQuitadorDePares(c, 0, 999, latch), "T1");
+        Thread t2 = new Thread(new HiloQuitadorDeImpares(c, 1, 999, latch), "T2");
+
+        t1.start();
+        t2.start();
+
+        Integer[] intArray = new Integer[0];
+        chequearTerminacion(latch, c, intArray);
+    }
+
+    //En un conjunto con 1000 números creamos dos hilos que quitan los pares y otros dos que quitan los impares
+    public void cuatroHilosQuitando1000Numeros(Conjunto<Integer> c) {
+        System.out.print("cuatroHilosQuitando1000Numeros: ");
+
+        int latchGroupCount = 4;
+        CountDownLatch latch = new CountDownLatch(latchGroupCount);
+        Thread t1 = new Thread(new HiloQuitadorDePares(c, 0, 499, latch), "T1");
+        Thread t2 = new Thread(new HiloQuitadorDeImpares(c, 1, 499, latch), "T2");
+        Thread t3 = new Thread(new HiloQuitadorDePares(c, 500, 999, latch), "T3");
+        Thread t4 = new Thread(new HiloQuitadorDeImpares(c, 501, 999, latch), "T4");
+
+        t1.start();
+        t2.start();
+        t3.start();
+        t4.start();
+
+        Integer[] intArray = new Integer[0];
+        chequearTerminacion(latch, c, intArray);
+    }
+
 
     public void chequearTerminacion(CountDownLatch latch, Conjunto<Integer> c, Integer[] intArray) {
         try {
