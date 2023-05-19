@@ -5,7 +5,9 @@ public class Tester {
     public void correrTests() {
         System.out.println("Corriendo Tests:");
         correrTestsParaLocksFinos();
+        System.out.println();
         correrTestsParaOptimista();
+        System.out.println();
         //correrTestsParaSinLocks(); lo comento porque no está implementado todavía
     }
 
@@ -22,8 +24,10 @@ public class Tester {
         cuatroHilosAgregando1000Numeros(c);
         
         System.out.print("[locks finos] ");
-        cuatroHilosQuitando1000Numeros(c);
-               
+        cuatroHilosQuitando1000Numeros(c);   
+
+        System.out.print("[locks finos] ");
+        testearHilosAgregandoYQuitandoCuatroYSeis(c);    
     }
 
     public void correrTestsParaOptimista() {
@@ -40,6 +44,9 @@ public class Tester {
         
         System.out.print("[optimista] ");
         cuatroHilosQuitando1000Numeros(c);
+        
+        System.out.print("[optimista] ");
+        testearHilosAgregandoYQuitandoCuatroYSeis(c);  
     }
 
     //Agregamos 1000 números y creamos un hilo que agrega los pares y otro que agrega los impares
@@ -116,6 +123,44 @@ public class Tester {
 
         Integer[] intArray = new Integer[0];
         chequearTerminacion(latch, c, intArray);
+    }
+
+
+    public void testearHilosAgregandoYQuitandoCuatroYSeis(Conjunto<Integer> c) {
+        //agregamos del 1 al 10 para tener un conjunto inicial donde podamos quitar elementos del medio
+        for(int i=1; i<=10; i++) {
+            c.agregar(i);
+        }
+
+        hilosAgregandoYQuitandoCuatroYSeis(c);
+    }
+
+    //Hilos que agregan y quitan 4 y 6 mil veces.
+    public void hilosAgregandoYQuitandoCuatroYSeis(Conjunto<Integer> c) {
+        System.out.print("hilosAgregandoYQuitandoCuatroYSeis: ");
+
+        int latchGroupCount = 4;
+        CountDownLatch latch = new CountDownLatch(latchGroupCount);
+        Thread t1 = new Thread(new HiloAgregadorIterativamente(c, 4, 1000, latch), "T1");
+        Thread t2 = new Thread(new HiloAgregadorIterativamente(c, 6, 1000, latch), "T2");
+        Thread t3 = new Thread(new HiloQuitadorIterativamente(c, 4, 1000, latch), "T3");
+        Thread t4 = new Thread(new HiloQuitadorIterativamente(c, 6, 1000, latch), "T4");
+
+        t1.start();
+        t2.start();
+        t3.start();
+        t4.start();
+
+        try {
+            latch.await();
+            if(c.pertenece(5)){
+                System.out.println("OK");
+            } else {
+                System.out.println("NOT OK");
+            }
+        } catch (InterruptedException e) {
+            System.out.println("NOT OK " + e.toString());
+        }
     }
 
 
