@@ -35,42 +35,31 @@ public class Tester {
 
     public void unHiloAgregando1000Numeros(Conjunto<Integer> c, String mensajeDeSalida) {
         System.out.print(mensajeDeSalida + "unHiloAgregando1000Numeros: ");
+        Integer[] intArray = new Integer[1000];
         for (Integer i = 0; i < 1000; i = i + 1) {
             c.agregar(i);
-        }
-        Integer[] intArray = new Integer[1000];
-        for(Integer i=0; i < intArray.length; i++) {
             intArray[i] = i;
         }
-        if (c.esEquivalenteA(intArray)) {
-            System.out.println("OK");
-        } else {
-            System.out.println("NOT OK");
-        }
+
+        System.out.println(c.esEquivalenteA(intArray) ? "OK" : "NOT OK");
         c.vaciar();
     }
 
     public void unHiloSacando1000Numeros(Conjunto<Integer> c, String mensajeDeSalida) {
         System.out.print(mensajeDeSalida + "unHiloSacando1000Numeros: ");
+        Integer[] intArray = new Integer[1000];
         for (Integer i = 0; i < 1000; i = i + 1) {
             c.agregar(i);
-        }
-
-        Integer[] intArray = new Integer[1000];
-        for(Integer i=0; i < intArray.length; i++) {
             intArray[i] = i;
         }
+
         if (c.esEquivalenteA(intArray)) {
             for (Integer i = 0; i < 1000; i = i + 1) {
                 c.quitar(i);
             }
 
             intArray = new Integer[]{};
-            if (c.esEquivalenteA(intArray)) {
-                System.out.println("OK");
-            } else {
-                System.out.println("NOT OK");
-            }
+            System.out.println(c.esEquivalenteA(intArray) ? "OK" : "NOT OK");
         } else {
             System.out.println("NOT OK");
         }
@@ -158,11 +147,17 @@ public class Tester {
 
     public void testearHilosAgregandoYQuitandoCuatroYSeis(Conjunto<Integer> c, String mensajeDeSalida) {
         //agregamos del 1 al 10 para tener un conjunto inicial donde podamos quitar elementos del medio
+        Integer[] intArray = new Integer[10];
         for(int i=1; i<=10; i++) {
             c.agregar(i);
+            intArray[i-1] = i;
         }
 
-        hilosAgregandoYQuitandoCuatroYSeis(c, mensajeDeSalida);
+        if (c.esEquivalenteA(intArray)) {
+            hilosAgregandoYQuitandoCuatroYSeis(c, mensajeDeSalida);
+        } else {
+            System.out.println("ERROR: no se pudo hacer el test");
+        }
     }
 
     //Hilos que agregan y quitan 4 y 6 mil veces.
@@ -194,15 +189,10 @@ public class Tester {
         }
     }
 
-
     public void chequearTerminacion(CountDownLatch latch, Conjunto<Integer> c, Integer[] intArray) {
         try {
             latch.await();
-            if (c.esEquivalenteA(intArray)) {
-                System.out.println("OK");
-            } else {
-                System.out.println("NOT OK");
-            }
+            System.out.println(c.esEquivalenteA(intArray) ? "OK" : "NOT OK");
         } catch (InterruptedException e) {
             System.out.println("EXCEPTION:  " + e.toString());
         }
