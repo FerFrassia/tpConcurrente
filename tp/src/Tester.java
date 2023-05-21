@@ -192,7 +192,12 @@ public class Tester {
     public void chequearTerminacion(CountDownLatch latch, Conjunto<Integer> c, Integer[] intArray) {
         try {
             latch.await();
-            System.out.println(c.esEquivalenteA(intArray) ? "OK" : "NOT OK");
+            if(c.esEquivalenteA(intArray)){
+                System.out.println("OK");
+            } else {
+                System.out.print("NOT OK: ");
+                c.print();
+            }
         } catch (InterruptedException e) {
             System.out.println("EXCEPTION:  " + e.toString());
         }

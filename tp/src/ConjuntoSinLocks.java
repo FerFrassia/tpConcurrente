@@ -1,3 +1,6 @@
+import java.util.concurrent.atomic.AtomicMarkableReference;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class ConjuntoSinLocks<T> extends Conjunto<T> {
 
     private ARList<T> atomicList;
@@ -16,65 +19,95 @@ public class ConjuntoSinLocks<T> extends Conjunto<T> {
             previousNode = nodePair.previousNode;
             currentNode = nodePair.currentNode;
 
-            currentNode = previousNode.next.get();
+            currentNode = previousNode.next.getReference();
             if (currentNode != null && currentNode.key == key) return false; //Si el elemento ya esta en la lista, no se puede agregar 
             else {
                 ARNode<T> node = new ARNode<T>(elemento);
-                node.next.set(currentNode);
-                if (previousNode.next.compareAndSet(currentNode, node)) return true;  //Si el proximo nodo del anterior es el esperado, se agrega el nuevo nodo
+                node.next = new AtomicMarkableReference<ARNode<T>>(currentNode, false);
+                if (previousNode.next.compareAndSet(currentNode, node, false, false)) return true;  //Si el proximo nodo del anterior es el esperado, se agrega el nuevo nodo
             }
         }
     }
 
-    private ARNodePair<T> encontrar_previo_y_proximo(T elemento){ //Funcion que busca el anterior al elemento buscado
-        ARNode<T> previousNode = atomicList.head.get();
-        ARNode<T> currentNode = previousNode.next.get();
+    private ARNodePair<T> encontrar_previo_y_proximo(T elemento){
+        ARNode<T> previousNode = atomicList.head.getReference();
+        ARNode<T> currentNode = previousNode.next.getReference();
         ARNode<T> nextNode;
         int key = elemento.hashCode();
-        while (currentNode != null && currentNode.key < key) {
-            currentNode = previousNode.next.get();
-            nextNode = currentNode.next.get();
+        boolean[] marked ={false};
+
+        tryAgain: while (true) {
+            previousNode = atomicList.head.getReference();
+            currentNode = previousNode.next.getReference();
+            
+            while (true) {
+                if (currentNode == null) {
+                    return new ARNodePair<T>(previousNode, null);
+                }
+                nextNode = currentNode.next.get(marked);
+                
+                while (marked[0]) {
+                    boolean snip = previousNode.next.compareAndSet(currentNode, nextNode, false, false);
+                    if (!snip)  continue tryAgain;
+                    
+                    currentNode = nextNode;
+                    nextNode = currentNode.next.get(marked);
+                }
+                
+                if (currentNode.key >= key) {
+                    return new ARNodePair<T>(previousNode, currentNode);
+                }
+                
+                previousNode = currentNode;
+                currentNode = nextNode;
+            }
+        }
+
+        /*while (currentNode != null && currentNode.key < key) {
+            currentNode = previousNode.next.getReference();
+            nextNode = currentNode.next.getReference();
 
             previousNode = currentNode;
             currentNode = nextNode;
         }
-        return new ARNodePair<T>(previousNode, currentNode);
+        return new ARNodePair<T>(previousNode, currentNode);*/
     }
 
     @Override
     public boolean pertenece(T elemento) {
-        ARNode<T> currentNode = atomicList.head.get().next.get();
-        while (currentNode != null && currentNode.key != elemento.hashCode()) {
-            currentNode = currentNode.next.get();
+        int key = elemento.hashCode();
+        ARNode<T> currentNode = atomicList.head.getReference().next.getReference();
+        boolean marked = false;
+        while (currentNode != null && currentNode.key != key) {
+            marked = currentNode.next.isMarked();
+            currentNode = currentNode.next.getReference();
         }
-        return currentNode != null && currentNode.key == elemento.hashCode();
+        return currentNode != null && currentNode.key == key && !marked;
     }
 
     @Override
     public boolean quitar(T elemento) {
-        try {
-            quitarSinLocks(elemento);
-            return true;
-        } catch (EmptyException e) {
-            return false;
-        }
-    }
-
-    public boolean quitarSinLocks(T elemento) throws EmptyException {
         int key = elemento.hashCode();
         ARNodePair<T> nodePair;
-        ARNode<T> previousNode, currentNode;
+        ARNode<T> previousNode, currentNode, nextNode;
+        boolean snip;
         while (true) {
-            ARNode<T> first = atomicList.head.get();
-            if(first == null) throw new EmptyException();
-
             nodePair = encontrar_previo_y_proximo(elemento);
             previousNode = nodePair.previousNode;
             currentNode = nodePair.currentNode;
+
+
             if(currentNode == null || currentNode.key != key) return false;
             else {
-                ARNode<T> nextNode = currentNode.next.get();
-                if (previousNode.next.compareAndSet(currentNode, nextNode)) return true;
+                nextNode = currentNode.next.getReference();
+                snip = currentNode.next.compareAndSet(nextNode, nextNode, false, true);
+                if(!snip) continue;
+                if (previousNode.next.compareAndSet(currentNode, nextNode, false, false)){
+                    return true;
+                }
+                /*if (!snip) continue;
+                if(nextNode != null) System.out.println(elemento + ") nextNode: " + nextNode.item);
+                if (previousNode.next.compareAndSet(currentNode, nextNode, false, false)) return true;*/
             }
         }
     }
@@ -82,13 +115,13 @@ public class ConjuntoSinLocks<T> extends Conjunto<T> {
     @Override
     public void print() {
         System.out.print("[");
-        ARNode<T> currentNode = atomicList.head.get();
+        ARNode<T> currentNode = atomicList.head.getReference();
         while (currentNode != null) {
             System.out.print(currentNode.item);
-            if (currentNode.next.get() != null) {
+            if (currentNode.next.getReference() != null) {
                 System.out.print(" -> ");
             }
-            currentNode = currentNode.next.get();
+            currentNode = currentNode.next.getReference();
         }
         System.out.println("]");
     }
@@ -99,7 +132,7 @@ public class ConjuntoSinLocks<T> extends Conjunto<T> {
     }
 
     private boolean todosLosDelConjuntoEstanEnA(T[] arr) {
-        ARNode<T> currentNode = atomicList.head.get().next.get();
+        ARNode<T> currentNode = atomicList.head.getReference().next.getReference();
         while (currentNode != null) {
             boolean estaPresente = false;
             for (T object: arr) {
@@ -112,7 +145,7 @@ public class ConjuntoSinLocks<T> extends Conjunto<T> {
                 System.out.println(currentNode.item.toString() + " no está presente en el arreglo ");
                 return false;
             }
-            currentNode = currentNode.next.get();
+            currentNode = currentNode.next.getReference();
         }
         return true;
     }
