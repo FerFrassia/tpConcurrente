@@ -18,7 +18,6 @@ public class Conjunto<T> {
 
     //Métodos auxiliares
     public void print() {
-        System.out.print("Locks Finos: ");
         System.out.print("[");
         Node currentNode = list.head.next;
         while (currentNode != null) {

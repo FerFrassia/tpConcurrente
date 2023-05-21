@@ -1,4 +1,3 @@
-
 import java.util.concurrent.CountDownLatch;
 
 public class HiloQuitadorDePares extends Thread {
