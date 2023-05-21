@@ -8,32 +8,46 @@ public class ConjuntoSinLocks<T> extends Conjunto<T> {
 
     @Override
     public boolean agregar(T elemento) {
-        ARNode<T> node = new ARNode<T>(elemento);
+        int key = elemento.hashCode();
+        ARNodePair<T> nodePair;
+        ARNode<T> previousNode, currentNode;
         while (true) {
-            ARNode<T> last = atomicList.tail.get();
-            ARNode<T> next = last.next.get();
-            if (last == atomicList.tail.get()) {
-                if (next == null) {
-                    if (last.next.compareAndSet(next, node)) {
-                        return atomicList.tail.compareAndSet(last, node);
-                    }
-                } else {
-                    atomicList.tail.compareAndSet(last, next);
-                }
+            nodePair = encontrar_previo_y_proximo(elemento);
+            previousNode = nodePair.previousNode;
+            currentNode = nodePair.currentNode;
+
+            currentNode = previousNode.next.get();
+            if (currentNode != null && currentNode.key == key) return false; //Si el elemento ya esta en la lista, no se puede agregar 
+            else {
+                ARNode<T> node = new ARNode<T>(elemento);
+                node.next.set(currentNode);
+                if (previousNode.next.compareAndSet(currentNode, node)) return true;  //Si el proximo nodo del anterior es el esperado, se agrega el nuevo nodo
             }
         }
+    }
+
+    private ARNodePair<T> encontrar_previo_y_proximo(T elemento){ //Funcion que busca el anterior al elemento buscado
+        ARNode<T> previousNode = atomicList.head.get();
+        ARNode<T> currentNode = previousNode.next.get();
+        ARNode<T> nextNode;
+        int key = elemento.hashCode();
+        while (currentNode != null && currentNode.key < key) {
+            currentNode = previousNode.next.get();
+            nextNode = currentNode.next.get();
+
+            previousNode = currentNode;
+            currentNode = nextNode;
+        }
+        return new ARNodePair<T>(previousNode, currentNode);
     }
 
     @Override
     public boolean pertenece(T elemento) {
         ARNode<T> currentNode = atomicList.head.get().next.get();
-        while (currentNode != null) {
-            if (currentNode.item.equals(elemento)) {
-                return true;
-            }
+        while (currentNode != null && currentNode.key != elemento.hashCode()) {
             currentNode = currentNode.next.get();
         }
-        return false;
+        return currentNode != null && currentNode.key == elemento.hashCode();
     }
 
     @Override
@@ -47,21 +61,20 @@ public class ConjuntoSinLocks<T> extends Conjunto<T> {
     }
 
     public boolean quitarSinLocks(T elemento) throws EmptyException {
+        int key = elemento.hashCode();
+        ARNodePair<T> nodePair;
+        ARNode<T> previousNode, currentNode;
         while (true) {
             ARNode<T> first = atomicList.head.get();
-            ARNode<T> last = atomicList.tail.get();
-            ARNode<T> next = first.next.get();
-            if (first == atomicList.head.get()) {
-                if (first == last) {
-                    if (next == null) {
-                        throw new EmptyException();
-                    }
-                    atomicList.tail.compareAndSet(last, next);
-                } else {
-                    if (atomicList.head.compareAndSet(first, next)) {
-                        return true;
-                    }
-                }
+            if(first == null) throw new EmptyException();
+
+            nodePair = encontrar_previo_y_proximo(elemento);
+            previousNode = nodePair.previousNode;
+            currentNode = nodePair.currentNode;
+            if(currentNode == null || currentNode.key != key) return false;
+            else {
+                ARNode<T> nextNode = currentNode.next.get();
+                if (previousNode.next.compareAndSet(currentNode, nextNode)) return true;
             }
         }
     }
