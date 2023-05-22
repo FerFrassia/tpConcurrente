@@ -19,7 +19,6 @@ public class ConjuntoSinLocks<T> extends Conjunto<T> {
             previousNode = nodePair.previousNode;
             currentNode = nodePair.currentNode;
 
-            currentNode = previousNode.next.getReference();
             if (currentNode != null && currentNode.key == key) return false; //Si el elemento ya esta en la lista, no se puede agregar 
             else {
                 ARNode<T> node = new ARNode<T>(elemento);
@@ -29,7 +28,7 @@ public class ConjuntoSinLocks<T> extends Conjunto<T> {
         }
     }
 
-    private ARNodePair<T> encontrar_previo_y_proximo(T elemento){
+    private ARNodePair<T> encontrar_previo_y_proximo(T elemento){ //TODO CAMBIAR ESTO
         ARNode<T> previousNode = atomicList.head.getReference();
         ARNode<T> currentNode = previousNode.next.getReference();
         ARNode<T> nextNode;
@@ -51,6 +50,9 @@ public class ConjuntoSinLocks<T> extends Conjunto<T> {
                     if (!snip)  continue tryAgain;
                     
                     currentNode = nextNode;
+                    if (currentNode == null) { //TODO: VER SI SE PUEDE SACAR ESTE IF
+                        return new ARNodePair<T>(previousNode, null);
+                    }
                     nextNode = currentNode.next.get(marked);
                 }
                 
@@ -63,14 +65,6 @@ public class ConjuntoSinLocks<T> extends Conjunto<T> {
             }
         }
 
-        /*while (currentNode != null && currentNode.key < key) {
-            currentNode = previousNode.next.getReference();
-            nextNode = currentNode.next.getReference();
-
-            previousNode = currentNode;
-            currentNode = nextNode;
-        }
-        return new ARNodePair<T>(previousNode, currentNode);*/
     }
 
     @Override
@@ -96,18 +90,14 @@ public class ConjuntoSinLocks<T> extends Conjunto<T> {
             previousNode = nodePair.previousNode;
             currentNode = nodePair.currentNode;
 
-
             if(currentNode == null || currentNode.key != key) return false;
             else {
                 nextNode = currentNode.next.getReference();
+                //if(nextNode != null) System.out.println("El elemento " + elemento + " esta intentando hacer un puente entre " + previousNode.item + " y " + nextNode.item);
+                //else System.out.println("El elemento " + elemento + " esta intentando hacer un puente entre " + previousNode.item + " y null" );
                 snip = currentNode.next.compareAndSet(nextNode, nextNode, false, true);
                 if(!snip) continue;
-                if (previousNode.next.compareAndSet(currentNode, nextNode, false, false)){
-                    return true;
-                }
-                /*if (!snip) continue;
-                if(nextNode != null) System.out.println(elemento + ") nextNode: " + nextNode.item);
-                if (previousNode.next.compareAndSet(currentNode, nextNode, false, false)) return true;*/
+                if (previousNode.next.compareAndSet(currentNode, nextNode, false, false)) return true;
             }
         }
     }
