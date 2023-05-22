@@ -28,37 +28,29 @@ public class ConjuntoSinLocks<T> extends Conjunto<T> {
         }
     }
 
-    private ARNodePair<T> encontrar_previo_y_proximo(T elemento){ //TODO CAMBIAR ESTO
-        ARNode<T> previousNode = atomicList.head.getReference();
-        ARNode<T> currentNode = previousNode.next.getReference();
-        ARNode<T> nextNode;
+    private ARNodePair<T> encontrar_previo_y_proximo(T elemento){ 
+        ARNode<T> previousNode, currentNode, nextNode;
         int key = elemento.hashCode();
         boolean[] marked ={false};
+        boolean ableToChangeNextNode;
 
-        tryAgain: while (true) {
+        findAgain: while (true) {
             previousNode = atomicList.head.getReference();
             currentNode = previousNode.next.getReference();
-            
             while (true) {
-                if (currentNode == null) {
-                    return new ARNodePair<T>(previousNode, null);
-                }
+                if (currentNode == null) return new ARNodePair<T>(previousNode, null);
                 nextNode = currentNode.next.get(marked);
-                
-                while (marked[0]) {
-                    boolean snip = previousNode.next.compareAndSet(currentNode, nextNode, false, false);
-                    if (!snip)  continue tryAgain;
+                while (marked[0]) { //Intento eliminar nodos marcados
+                    ableToChangeNextNode = previousNode.next.compareAndSet(currentNode, nextNode, false, false);
+                    if (!ableToChangeNextNode)  continue findAgain;
+
+                    if(nextNode == null) return new ARNodePair<T>(previousNode, null);
                     
                     currentNode = nextNode;
-                    if (currentNode == null) { //TODO: VER SI SE PUEDE SACAR ESTE IF
-                        return new ARNodePair<T>(previousNode, null);
-                    }
                     nextNode = currentNode.next.get(marked);
                 }
                 
-                if (currentNode.key >= key) {
-                    return new ARNodePair<T>(previousNode, currentNode);
-                }
+                if (currentNode.key >= key)  return new ARNodePair<T>(previousNode, currentNode);
                 
                 previousNode = currentNode;
                 currentNode = nextNode;
@@ -84,7 +76,7 @@ public class ConjuntoSinLocks<T> extends Conjunto<T> {
         int key = elemento.hashCode();
         ARNodePair<T> nodePair;
         ARNode<T> previousNode, currentNode, nextNode;
-        boolean snip;
+        boolean ableToChangeMark;
         while (true) {
             nodePair = encontrar_previo_y_proximo(elemento);
             previousNode = nodePair.previousNode;
@@ -93,10 +85,8 @@ public class ConjuntoSinLocks<T> extends Conjunto<T> {
             if(currentNode == null || currentNode.key != key) return false;
             else {
                 nextNode = currentNode.next.getReference();
-                //if(nextNode != null) System.out.println("El elemento " + elemento + " esta intentando hacer un puente entre " + previousNode.item + " y " + nextNode.item);
-                //else System.out.println("El elemento " + elemento + " esta intentando hacer un puente entre " + previousNode.item + " y null" );
-                snip = currentNode.next.compareAndSet(nextNode, nextNode, false, true);
-                if(!snip) continue;
+                ableToChangeMark = currentNode.next.compareAndSet(nextNode, nextNode, false, true);
+                if(!ableToChangeMark) continue;
                 if (previousNode.next.compareAndSet(currentNode, nextNode, false, false)) return true;
             }
         }
