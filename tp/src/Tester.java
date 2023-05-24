@@ -166,10 +166,10 @@ public class Tester {
 
         int latchGroupCount = 4;
         CountDownLatch latch = new CountDownLatch(latchGroupCount);
-        Thread t1 = new Thread(new HiloAgregadorIterativamente(c, 4, 1000, latch), "T1");
-        Thread t2 = new Thread(new HiloAgregadorIterativamente(c, 6, 1000, latch), "T2");
-        Thread t3 = new Thread(new HiloQuitadorIterativamente(c, 4, 1000, latch), "T3");
-        Thread t4 = new Thread(new HiloQuitadorIterativamente(c, 6, 1000, latch), "T4");
+        Thread t1 = new Thread(new HiloAgregadorIterativamente(c, 4, 2, latch), "T1");
+        Thread t2 = new Thread(new HiloAgregadorIterativamente(c, 6, 2, latch), "T2");
+        Thread t3 = new Thread(new HiloQuitadorIterativamente(c, 4, 2, latch), "T3");
+        Thread t4 = new Thread(new HiloQuitadorIterativamente(c, 6, 2, latch), "T4");
 
         t1.start();
         t2.start();
