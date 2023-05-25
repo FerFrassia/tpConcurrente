@@ -2,6 +2,8 @@ import java.util.concurrent.CountDownLatch;
 
 public class Tester {
 
+    boolean print_tiempo_tests = true;
+
     public void correrTests() {
         System.out.println("Corriendo Tests:");
         correrTestsParaLocksFinos();
@@ -35,18 +37,20 @@ public class Tester {
 
     public void unHiloAgregando1000Numeros(Conjunto<Integer> c, String mensajeDeSalida) {
         System.out.print(mensajeDeSalida + "unHiloAgregando1000Numeros: ");
+        long startTime = System.currentTimeMillis();
         Integer[] intArray = new Integer[1000];
         for (Integer i = 0; i < 1000; i = i + 1) {
             c.agregar(i);
             intArray[i] = i;
         }
-
         System.out.println(c.esEquivalenteA(intArray) ? "OK" : "NOT OK");
+        print_tiempo_tardado(startTime);
         c.vaciar();
     }
 
     public void unHiloSacando1000Numeros(Conjunto<Integer> c, String mensajeDeSalida) {
         System.out.print(mensajeDeSalida + "unHiloSacando1000Numeros: ");
+        long startTime = System.currentTimeMillis();
         Integer[] intArray = new Integer[1000];
         for (Integer i = 0; i < 1000; i = i + 1) {
             c.agregar(i);
@@ -63,13 +67,14 @@ public class Tester {
         } else {
             System.out.println("NOT OK");
         }
-
+        print_tiempo_tardado(startTime);
         c.vaciar();
     }
 
     //Agregamos 1000 números y creamos un hilo que agrega los pares y otro que agrega los impares
     public void dosHilosAgregando1000Numeros(Conjunto<Integer> c, String mensajeDeSalida) {
         System.out.print(mensajeDeSalida + "dosHilosAgregando1000Numeros: ");
+        long startTime = System.currentTimeMillis();
         int latchGroupCount = 2;
         CountDownLatch latch = new CountDownLatch(latchGroupCount);
         Thread t1 = new Thread(new HiloAgregadorDePares(c, 0, 999, latch), "T1");
@@ -83,12 +88,14 @@ public class Tester {
             intArray[i] = i;
         }
         chequearTerminacion(latch, c, intArray);
+        print_tiempo_tardado(startTime);
+
     }
 
     //Agregamos 1000 números y creamos dos hilos que agrega los pares y dos que agregan los impares:
     public void cuatroHilosAgregando1000Numeros(Conjunto<Integer> c, String mensajeDeSalida) {
         System.out.print(mensajeDeSalida + "cuatroHilosAgregando1000Numeros: ");
-
+        long startTime = System.currentTimeMillis();
         int latchGroupCount = 4;
         CountDownLatch latch = new CountDownLatch(latchGroupCount);
         Thread t1 = new Thread(new HiloAgregadorDePares(c, 0, 499, latch), "T1");
@@ -106,12 +113,14 @@ public class Tester {
             intArray[i] = i;
         }
         chequearTerminacion(latch, c, intArray);
+        print_tiempo_tardado(startTime);
         c.vaciar();
     }
 
     //En un conjunto con 1000 números creamos un hilo que quita los pares y otro que quita los impares
     public void dosHilosQuitando1000Numeros(Conjunto<Integer> c, String mensajeDeSalida) {
         System.out.print(mensajeDeSalida + "dosHilosQuitando1000Numeros: ");
+        long startTime = System.currentTimeMillis();
         int latchGroupCount = 2;
         CountDownLatch latch = new CountDownLatch(latchGroupCount);
         Thread t1 = new Thread(new HiloQuitadorDePares(c, 0, 999, latch), "T1");
@@ -122,12 +131,13 @@ public class Tester {
 
         Integer[] intArray = new Integer[0];
         chequearTerminacion(latch, c, intArray);
+        print_tiempo_tardado(startTime);
     }
 
     //En un conjunto con 1000 números creamos dos hilos que quitan los pares y otros dos que quitan los impares
     public void cuatroHilosQuitando1000Numeros(Conjunto<Integer> c, String mensajeDeSalida) {
         System.out.print(mensajeDeSalida + "cuatroHilosQuitando1000Numeros: ");
-
+        long startTime = System.currentTimeMillis();
         int latchGroupCount = 4;
         CountDownLatch latch = new CountDownLatch(latchGroupCount);
         Thread t1 = new Thread(new HiloQuitadorDePares(c, 0, 499, latch), "T1");
@@ -142,12 +152,14 @@ public class Tester {
 
         Integer[] intArray = new Integer[0];
         chequearTerminacion(latch, c, intArray);
+        print_tiempo_tardado(startTime);
         c.vaciar();
     }
 
     public void testearHilosAgregandoYQuitandoCuatroYSeis(Conjunto<Integer> c, String mensajeDeSalida) {
         //agregamos del 1 al 10 para tener un conjunto inicial donde podamos quitar elementos del medio
         Integer[] intArray = new Integer[10];
+        long startTime = System.currentTimeMillis();
         for(int i=1; i<=10; i++) {
             c.agregar(i);
             intArray[i-1] = i;
@@ -155,6 +167,7 @@ public class Tester {
 
         if (c.esEquivalenteA(intArray)) {
             hilosAgregandoYQuitandoCuatroYSeis(c, mensajeDeSalida);
+            print_tiempo_tardado(startTime);
         } else {
             System.out.println("ERROR: no se pudo hacer el test");
         }
@@ -181,7 +194,7 @@ public class Tester {
             if(c.pertenece(5)){
                 System.out.println("OK");
             } else {
-                System.out.print("NOT OK, el 5 no está presente: ");
+                System.out.println("NOT OK, el 5 no está presente: ");
                 c.print();
             }
         } catch (InterruptedException e) {
@@ -192,13 +205,21 @@ public class Tester {
     public void chequearTerminacion(CountDownLatch latch, Conjunto<Integer> c, Integer[] intArray) {
         try {
             latch.await();
-            System.out.println(c.esEquivalenteA(intArray) ? "OK" : "NOT OK");
+            if(c.esEquivalenteA(intArray)){
+                System.out.println("OK");
+            } else {
+                System.out.println("NOT OK");
+            }
         } catch (InterruptedException e) {
             System.out.println("EXCEPTION:  " + e.toString());
         }
     }
 
-
+    private void print_tiempo_tardado(long startTime) {
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+        if(print_tiempo_tests) System.out.println(" ---Tiempo de test: " + elapsedTime + " milisegundos---");
+    }
 
 
 }

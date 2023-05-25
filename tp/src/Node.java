@@ -12,7 +12,7 @@ public class Node<T> {
 
     public Node(T item) {
         this.item = item;
-        if(item == null) this.key = 0;
+        if(item == null) this.key = -1;
         else this.key = item.hashCode();
         this.lock = new ReentrantLock();
     }

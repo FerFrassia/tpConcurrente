@@ -1,12 +1,12 @@
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicMarkableReference;
 
 public class ARList<T> {
-    public AtomicReference<ARNode<T>> head;
-    public AtomicReference<ARNode<T>> tail;
+    public AtomicMarkableReference<ARNode<T>> head;
+    //public AtomicMarkableReference<ARNode<T>> tail;
 
     public ARList() {
         ARNode<T> centinell = new ARNode<T>(null);
-        head = new AtomicReference<ARNode<T>>(centinell);
-        tail = new AtomicReference<ARNode<T>>(centinell);
+        head = new AtomicMarkableReference<ARNode<T>>(centinell, false);
+        //tail = new AtomicMarkableReference<ARNode<T>>(centinell, false);
     }
 }
