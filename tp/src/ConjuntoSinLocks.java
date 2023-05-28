@@ -85,7 +85,7 @@ public class ConjuntoSinLocks<T> extends Conjunto<T> {
             if(currentNode == null || currentNode.key != key) return false;
             else {
                 nextNode = currentNode.next.getReference();
-                ableToChangeMark = currentNode.next.compareAndSet(nextNode, nextNode, false, true);
+                ableToChangeMark = currentNode.next.attemptMark(nextNode, true);//.compareAndSet(nextNode, nextNode, false, true);
                 if(!ableToChangeMark) continue;
                 if (previousNode.next.compareAndSet(currentNode, nextNode, false, false)) return true;
             }
