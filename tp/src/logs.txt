@@ -1,0 +1,45 @@
+Corriendo Tests:
+[locks finos] unHiloAgregando10000Numeros: OK
+ ---Tiempo de test: 1326 milisegundos--- 
+[locks finos] unHiloSacando10000Numeros: OK
+ ---Tiempo de test: 1280 milisegundos---     
+[locks finos] dosHilosAgregando10000Numeros: OK
+ ---Tiempo de test: 1262 milisegundos---      
+[locks finos] dosHilosQuitando10000Numeros: OK
+ ---Tiempo de test: 9 milisegundos---
+[locks finos] cuatroHilosAgregando10000Numeros: OK
+ ---Tiempo de test: 972 milisegundos---
+[locks finos] cuatroHilosQuitando10000Numeros: OK 
+ ---Tiempo de test: 4 milisegundos---
+[locks finos] hilosAgregandoYQuitandoCuatroYSeis: OK
+ ---Tiempo de test: 34 milisegundos---
+
+[optimista] unHiloAgregando10000Numeros: OK
+ ---Tiempo de test: 698 milisegundos---
+[optimista] unHiloSacando10000Numeros: OK
+ ---Tiempo de test: 662 milisegundos---
+[optimista] dosHilosAgregando10000Numeros: OK
+ ---Tiempo de test: 672 milisegundos---
+[optimista] dosHilosQuitando10000Numeros: OK
+ ---Tiempo de test: 7 milisegundos---
+[optimista] cuatroHilosAgregando10000Numeros: OK
+ ---Tiempo de test: 559 milisegundos---
+[optimista] cuatroHilosQuitando10000Numeros: OK
+ ---Tiempo de test: 5 milisegundos---
+[optimista] hilosAgregandoYQuitandoCuatroYSeis: OK
+ ---Tiempo de test: 19 milisegundos---
+
+[sin locks] unHiloAgregando10000Numeros: OK
+ ---Tiempo de test: 668 milisegundos---
+[sin locks] unHiloSacando10000Numeros: OK
+ ---Tiempo de test: 614 milisegundos---
+[sin locks] dosHilosAgregando10000Numeros: OK
+ ---Tiempo de test: 721 milisegundos---
+[sin locks] dosHilosQuitando10000Numeros: OK
+ ---Tiempo de test: 9 milisegundos---
+[sin locks] cuatroHilosAgregando10000Numeros: OK
+ ---Tiempo de test: 576 milisegundos---
+[sin locks] cuatroHilosQuitando10000Numeros: OK
+ ---Tiempo de test: 2 milisegundos---
+[sin locks] hilosAgregandoYQuitandoCuatroYSeis: OK
+ ---Tiempo de test: 6 milisegundos---
