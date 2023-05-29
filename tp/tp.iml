@@ -7,5 +7,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="codehaus.jackson.core.asl" level="project" />
+    <orderEntry type="library" name="codehaus.jackson.mapper.asl" level="project" />
+    <orderEntry type="library" name="json" level="project" />
   </component>
 </module>
