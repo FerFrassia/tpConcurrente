@@ -134,9 +134,12 @@ def plotQuitarVsPertenecer():
 	plt.show()
 	file.close()
 
+def plot():
+	plotAgregarVsQuitar()
+	plotAgregarVsPertenecer()
+	plotQuitarVsPertenecer()
+	plotHilosManteniendoOperacionesTotales()
+	plotHilosManteniendoOperacionesPorHilo()
 
-#plotAgregarVsQuitar()
-#plotAgregarVsPertenecer()
-#plotQuitarVsPertenecer()
-#plotHilosManteniendoOperacionesTotales()
-plotHilosManteniendoOperacionesPorHilo()
+
+plot()
