@@ -4,14 +4,15 @@ public class Tester {
 
     boolean print_tiempo_tests = true;
     int cantidad_elementos = 10000;
+    int cantidad_de_iteraciones = 500;
 
     public void correrTests() {
-        System.out.println("Corriendo Tests:");
-        correrTestsParaLocksFinos();
-        System.out.println();
-        correrTestsParaOptimista();
-        System.out.println();
-        correrTestsParaSinLocks();
+        for (int i = 1; i <= cantidad_de_iteraciones; ++i) {
+            System.out.println("Corriendo Tests:");
+            correrTestsParaLocksFinos();
+            correrTestsParaOptimista();
+            correrTestsParaSinLocks();
+        }
     }
 
     public void correrTestsParaLocksFinos() {
